@@ -310,7 +310,7 @@ export default {
                   button.addEventListener('click', (e) => {
                       e.stopPropagation();
                     // Устанавливаем значение переменной selectedDate напрямую
-                    wwLib.setVariableValue('selectedDate', date.toISOString());
+                    wwLib.setVariableValue('selectedDate', info.date.toISOString());
                     });
 
                     info.el.appendChild(button);
