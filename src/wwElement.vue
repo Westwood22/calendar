@@ -307,15 +307,10 @@ export default {
                     button.style.right = '2px';
                     button.style.zIndex = '10';
 
-                    button.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        emit('trigger-event', {
-                            name: 'cellButtonClick',
-                            event: {
-                                value: info.dateStr,
-                                toggle: true,
-                            }
-                        });
+                  button.addEventListener('click', (e) => {
+                      e.stopPropagation();
+                    // Устанавливаем значение переменной selectedDate напрямую
+                    wwLib.setVariableValue('selectedDate', date.toISOString());
                     });
 
                     info.el.appendChild(button);
