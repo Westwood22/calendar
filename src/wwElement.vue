@@ -311,7 +311,7 @@ export default {
                       e.stopPropagation();
                     // Устанавливаем значение переменной selectedDate напрямую
                     
-                      console.log('setting date:', info.date.toISOString())
+                      console.log('setting date:', info.date.toISOString());
                     wwLib.setVariableValue('selectedDate', info.date.toISOString());
                      
                     });
