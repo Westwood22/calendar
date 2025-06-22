@@ -3,7 +3,7 @@ export default {
    name: 'FullCalendar',
     props: {
     selectedDate: {
-      type: 'string',
+      type: 'String',
       defaultValue: '',
       binding: {
         type: 'variable',
