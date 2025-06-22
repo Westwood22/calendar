@@ -309,12 +309,16 @@ export default {
 
                   button.addEventListener('click', (e) => {
                       e.stopPropagation();
-                    // Устанавливаем значение переменной selectedDate напрямую
                     
-                      console.log('setting date:', info.date.toISOString());
-                    wwLib.setVariableValue('selectedDate', info.date.toISOString());
-                     
-                    });
+                    const isoDate = info.date.toISOString();
+                    console.log('setting selectedDate:', isoDate);
+                    // Устанавливаем значение переменной WeWeb
+                    if (window.$ww && typeof window.$ww.setVariable === 'function') {
+                        window.$ww.setVariable('selectedDate', isoDate);
+                    } else {
+                        console.warn('WeWeb variable API not available: window.$ww.setVariable');
+                    }
+                });
 
                     info.el.appendChild(button);
                 },
