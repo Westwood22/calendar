@@ -307,18 +307,16 @@ export default {
                     button.style.right = '2px';
                     button.style.zIndex = '10';
 
-  button.addEventListener('click', (e) => {
+
+button.addEventListener('click', (e) => {
     e.stopPropagation();
     const date = info.date;
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
     const ymd = `${y}-${m}-${d}`;
-    // Главное — правильно сгенерировать событие для редактора WeWeb
-    emit('trigger-event', {
-        name: 'selectedDateChanged',
-        event: { value: ymd }
-    });
+    emit('update:selectedDate', ymd); // <-- вот это важно!
+    emit('trigger-event', { name: 'selectedDateChanged', event: { value: ymd } });
 });
 
                     info.el.appendChild(button);
