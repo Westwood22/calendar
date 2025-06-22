@@ -33,7 +33,7 @@ export default {
     },
 
     
-    emits: ['trigger-event'],
+    emits: ['trigger-event', 'update:selectedDate'],
     setup(props, { emit }) {
         const fullCalendarRef = useTemplateRef(null);
 
@@ -307,18 +307,19 @@ export default {
                     button.style.right = '2px';
                     button.style.zIndex = '10';
 
-                  button.addEventListener('click', (e) => {
-                      e.stopPropagation();
-                    
-                    const isoDate = info.date.toISOString();
-                    console.log('setting selectedDate:', isoDate);
-                    // Устанавливаем значение переменной WeWeb
-                    if (window.$ww && typeof window.$ww.setVariable === 'function') {
-                        window.$ww.setVariable('selectedDate', isoDate);
-                    } else {
-                        console.warn('WeWeb variable API not available: window.$ww.setVariable');
-                    }
-                });
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const date = info.date;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const ymd = `${y}-${m}-${d}`;
+    // Главное — правильно сгенерировать событие для редактора WeWeb
+    emit('trigger-event', {
+        name: 'selectedDateChanged',
+        event: { value: ymd }
+    });
+});
 
                     info.el.appendChild(button);
                 },
