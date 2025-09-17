@@ -308,16 +308,21 @@ export default {
                     button.style.zIndex = '10';
 
 
-button.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const date = info.date;
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    const ymd = `${y}-${m}-${d}`;
-    emit('update:selectedDate', ymd); // <-- вот это важно!
-    emit('trigger-event', { name: 'selectedDateChanged', event: { value: ymd } });
-});
+   button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Получаем ISO дату: 'YYYY-MM-DD'
+                        const dateString = info.date instanceof Date
+                            ? info.date.toISOString().slice(0, 10)
+                            : (info.dateStr || '');
+                        setSelectedDate(dateString);
+                        emit('trigger-event', {
+                            name: 'cellButtonClick',
+                            event: {
+                                value: dateString,
+                                toggle: true,
+                            }
+                        });
+                    });
 
                     info.el.appendChild(button);
                 },
