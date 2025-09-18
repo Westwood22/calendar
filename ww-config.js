@@ -1,16 +1,7 @@
 export default {
 
    name: 'FullCalendar',
-    props: {
-    selectedDate: {
-      type: 'String',
-      defaultValue: '',
-      binding: {
-        type: 'variable',
-        allowInput: true, // ← позволяет использовать v-model
-      },
-    },
-  },
+ 
     
     editor: {
         label: {
@@ -82,20 +73,6 @@ export default {
         ],
     },
     properties: {
-
-        selectedDate: {
-    label: { en: 'Selected date' },
-    type: 'Text',
-    section: 'settings',
-    bindable: true,
-    defaultValue: '',
-    bindingValidation: {
-        type: 'string',
-        tooltip: 'Bind to a string variable to track the selected date',
-    },
-},
-
-            
 
         // Title properties for Settings
         viewSettingsTitle: {
@@ -1562,4 +1539,5 @@ projectStartIcon: {
         },
     ],
 };
+
 
