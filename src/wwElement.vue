@@ -61,6 +61,18 @@ export default {
             defaultValue: null,
         });
 
+        function handleCellButtonClick(dateString) {
+        setSelectedDate(dateString);
+        emit('trigger-event', {
+            name: 'cellButtonClick',
+            event: {
+                value: dateString,
+                toggle: true,
+            }
+        });
+    }
+
+        
         const calendarKey = ref(Date.now());
         const showProjectStartIcon = computed(() => props.content?.showProjectStartIcon !== false); // true по умолчанию
         const projectStartIcon = computed(() => props.content?.projectStartIcon || '🚩');
@@ -307,22 +319,14 @@ export default {
                     button.style.right = '2px';
                     button.style.zIndex = '10';
 
+                    const dateString = info.date instanceof Date
+        ? info.date.toISOString().slice(0, 10)
+        : (info.dateStr || '');
 
-   button.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        // Получаем ISO дату: 'YYYY-MM-DD'
-                        const dateString = info.date instanceof Date
-                            ? info.date.toISOString().slice(0, 10)
-                            : (info.dateStr || '');
-                        setSelectedDate(dateString);
-                        emit('trigger-event', {
-                            name: 'cellButtonClick',
-                            event: {
-                                value: dateString,
-                                toggle: true,
-                            }
-                        });
-                    });
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleCellButtonClick(dateString);
+    });
 
                     info.el.appendChild(button);
                 },
