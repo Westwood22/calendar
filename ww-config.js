@@ -1,8 +1,8 @@
 export default {
 
-   name: 'FullCalendar',
- 
-    
+    name: 'FullCalendar',
+
+
     editor: {
         label: {
             en: 'FullCalendar',
@@ -17,19 +17,19 @@ export default {
             ['hideWeekends', 'startWeekOnSunday', 'hideDaysOfWeek'],
             'eventsTitle',
             ['events',
-            'eventsIdFormula',
-            'eventsTitleFormula',
-            'eventsStartFormula',
-            'eventsEndFormula',
-            'eventsAllDayFormula',
-            'eventsUserFormula',
-            'eventsBackgroundColorFormula',
-            'eventsBorderColorFormula',
-            'eventsTextColorFormula',
-            'eventsUrlFormula',
-            'eventsContentFormula',
-            'eventsDataFormula',
-            'eventsGroupIdFormula'],
+                'eventsIdFormula',
+                'eventsTitleFormula',
+                'eventsStartFormula',
+                'eventsEndFormula',
+                'eventsAllDayFormula',
+                'eventsUserFormula',
+                'eventsBackgroundColorFormula',
+                'eventsBorderColorFormula',
+                'eventsTextColorFormula',
+                'eventsUrlFormula',
+                'eventsContentFormula',
+                'eventsDataFormula',
+                'eventsGroupIdFormula'],
             ['showProjectStartIcon', 'projectStartIcon'],
             ['buttonTextToday', 'buttonTextYear', 'buttonTextMonth', 'buttonTextWeek', 'buttonTextDay', 'buttonTextList', 'noEventsText']
         ],
@@ -73,6 +73,10 @@ export default {
         ],
     },
     properties: {
+
+       
+
+
 
         // Title properties for Settings
         viewSettingsTitle: {
@@ -124,9 +128,9 @@ export default {
                 en: 'Cells',
             },
             editorOnly: true,
-                
-            },
-        
+
+        },
+
         buttonStyleTitle: {
             section: 'style',
             type: 'Title',
@@ -355,21 +359,21 @@ export default {
         },
 
 
-      showProjectStartIcon: {
-    type: 'OnOff',
-    label: { en: 'Show project start icon' },
-    section: 'settings',  // теперь в секции settings
-    defaultValue: true,
-    bindable: true,
-},
-projectStartIcon: {
-    type: 'Text',
-    label: { en: 'Project start icon (emoji or text)' },
-    section: 'settings',  // теперь в секции settings
-    defaultValue: '🚩',
-    bindable: true,
-    description: 'Any emoji or text, e.g., 🚩 ⭐ 🥇',
-},
+        showProjectStartIcon: {
+            type: 'OnOff',
+            label: { en: 'Show project start icon' },
+            section: 'settings',  // теперь в секции settings
+            defaultValue: true,
+            bindable: true,
+        },
+        projectStartIcon: {
+            type: 'Text',
+            label: { en: 'Project start icon (emoji or text)' },
+            section: 'settings',  // теперь в секции settings
+            defaultValue: '🚩',
+            bindable: true,
+            description: 'Any emoji or text, e.g., 🚩 ⭐ 🥇',
+        },
 
         cellTextColor: {
             label: { en: 'Text color' },
@@ -965,16 +969,16 @@ projectStartIcon: {
                 item: {
                     type: 'Object',
                     defaultValue: {
-                        id: '123', 
-                        title: 'Sample Event', 
+                        id: '123',
+                        title: 'Sample Event',
                         content: 'This is a sample event',
-                        start: '', 
-                        end: '', 
-                        allDay: false, 
+                        start: '',
+                        end: '',
+                        allDay: false,
                         backgroundColor: '#3788d8',
                         borderColor: '#3788d8',
                         textColor: '#ffffff',
-                        data: null, 
+                        data: null,
                         groupId: null,
                         user: null,
                     },
@@ -1031,7 +1035,7 @@ projectStartIcon: {
                                 type: 'Text',
                                 options: { placeholder: 'Group ID' },
                             },
-                             user: {
+                            user: {
                                 label: { en: 'user' },
                                 type: 'Text',
                                 options: { placeholder: 'User' },
@@ -1041,7 +1045,7 @@ projectStartIcon: {
                 },
             },
 
-           
+
 
             /* wwEditor:start */
             bindingValidation: {
@@ -1204,19 +1208,19 @@ projectStartIcon: {
             },
             hidden: (content, sidepanelContent, boundProps) =>
                 !Array.isArray(content.events) || !content.events?.length || !boundProps.events,
-        }, 
+        },
 
-         eventsUserFormula: {
+        eventsUserFormula: {
             label: { en: 'User (for avatar)' },
             type: 'Formula',
             section: 'settings',
             options: content => ({
                 template: Array.isArray(content.events) && content.events.length > 0 ? content.events[0] : null,
             }),
-          defaultValue: {
-             type: 'f',
-             code: "const user = context.mapping?.['user']; return user?.avatar?.url ? { avatar: user.avatar.url } : null;",
-        },
+            defaultValue: {
+                type: 'f',
+                code: "const user = context.mapping?.['user']; return user?.avatar?.url ? { avatar: user.avatar.url } : null;",
+            },
             hidden: (content, sidepanelContent, boundProps) =>
                 !Array.isArray(content.events) || !content.events?.length || !boundProps.events,
         },
@@ -1370,11 +1374,21 @@ projectStartIcon: {
             /* wwEditor:end */
         },
     },
+    componentVariables: [
+    
+    {
+      name: 'selectedDate',
+      type: 'string',
+      defaultValue: '',
+      readonly: false,
+      // bindable: true, // опционально
+    },
+  ],
     triggerEvents: [
         {
             name: 'eventClick',
             label: { en: 'On event click' },
-            event: { 
+            event: {
                 value: {
                     id: 'event1',
                     title: 'Sample Event',
@@ -1391,7 +1405,7 @@ projectStartIcon: {
         {
             name: 'viewChange',
             label: { en: 'On view change' },
-            event: { 
+            event: {
                 value: {
                     view: 'dayGridMonth',
                     start: new Date().toISOString(),
@@ -1403,7 +1417,7 @@ projectStartIcon: {
         {
             name: 'eventCreated',
             label: { en: 'On event created' },
-            event: { 
+            event: {
                 value: {
                     start: new Date().toISOString(),
                     end: new Date(new Date().getTime() + 3600000).toISOString(),
@@ -1414,7 +1428,7 @@ projectStartIcon: {
         {
             name: 'eventUpdated',
             label: { en: 'On event updated' },
-            event: { 
+            event: {
                 value: {
                     id: 'event1',
                     title: 'Updated Event',
@@ -1431,7 +1445,7 @@ projectStartIcon: {
         {
             name: 'eventDragStart',
             label: { en: 'On event drag start' },
-            event: { 
+            event: {
                 value: {
                     id: 'event1',
                     title: 'Dragging Event',
@@ -1444,7 +1458,7 @@ projectStartIcon: {
         {
             name: 'eventDragEnd',
             label: { en: 'On event drag end' },
-            event: { 
+            event: {
                 value: {
                     id: 'event1',
                     title: 'Dragged Event',
@@ -1457,7 +1471,7 @@ projectStartIcon: {
         {
             name: 'eventDrop',
             label: { en: 'On event drop' },
-            event: { 
+            event: {
                 value: {
                     id: 'event1',
                     title: 'Dropped Event',
@@ -1471,7 +1485,7 @@ projectStartIcon: {
         {
             name: 'eventResizeStart',
             label: { en: 'On event resize start' },
-            event: { 
+            event: {
                 value: {
                     id: 'event1',
                     title: 'Resizing Event',
@@ -1538,6 +1552,6 @@ projectStartIcon: {
             label: { en: 'Go to today' },
         },
     ],
+    
 };
-
 
