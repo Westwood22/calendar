@@ -32,8 +32,8 @@ export default {
         /* wwEditor:end */
     },
 
-    
-    emits: ['trigger-event', 'update:selectedDate'],
+
+    emits: ['trigger-event'],
     setup(props, { emit }) {
         const fullCalendarRef = useTemplateRef(null);
 
@@ -61,18 +61,25 @@ export default {
             defaultValue: null,
         });
 
-        function handleCellButtonClick(dateString) {
-        setSelectedDate(dateString);
-        emit('trigger-event', {
-            name: 'cellButtonClick',
-            event: {
-                value: dateString,
-                toggle: true,
-            }
+        const { value: selectedDate, setValue: setSelectedDate } = wwLib.wwVariable.useComponentVariable({
+            uid: props.uid,
+            name: 'selectedDate',
+            type: 'string',
+            defaultValue: '',
         });
-    }
 
-        
+      function handleCellButtonClick(dateString) {
+    setSelectedDate(dateString);
+    emit('trigger-event', {
+        name: 'cellButtonClick',
+        event: {
+            value: dateString,
+            toggle: true,
+        }
+    });
+}
+
+
         const calendarKey = ref(Date.now());
         const showProjectStartIcon = computed(() => props.content?.showProjectStartIcon !== false); // true по умолчанию
         const projectStartIcon = computed(() => props.content?.projectStartIcon || '🚩');
@@ -319,7 +326,21 @@ export default {
                     button.style.right = '2px';
                     button.style.zIndex = '10';
 
-                    const dateString = info.date instanceof Date
+
+
+                    /*  button.addEventListener('click', (e) => {
+                          e.stopPropagation();
+                          setSelectedDate(info.dateStr); // ← УСТАНАВЛИВАЕМ ЗНАЧЕНИЕ ПЕРЕМЕННОЙ
+                          emit('trigger-event', {
+                              name: 'cellButtonClick',
+                              event: {
+                                  value: info.dateStr,
+                                  toggle: true,
+                              }
+                          });
+                      });*/
+
+                     const dateString = info.date instanceof Date
         ? info.date.toISOString().slice(0, 10)
         : (info.dateStr || '');
 
@@ -327,6 +348,7 @@ export default {
         e.stopPropagation();
         handleCellButtonClick(dateString);
     });
+
 
                     info.el.appendChild(button);
                 },
@@ -344,118 +366,127 @@ export default {
 
 
                 eventContent: function (arg) {
-    const userAvatar = arg.event.extendedProps?.user?.avatar?.url;
-    const eventType = arg.event.extendedProps?.type;
-    const durationMs = arg.event.extendedProps?.duration;
-    const height = arg.event.extendedProps?.height;
-    const eventData = arg.event.extendedProps?.data || {};
-    const eventProject = eventData?.project || {};
-    const client = arg.event.extendedProps?.client || {};
-    const clientFullName = [client.firstname, client.surname].filter(Boolean).join(' ');
+                    const userAvatar = arg.event.extendedProps?.user?.avatar?.url;
+                    const eventType = arg.event.extendedProps?.type;
+                    const durationMs = arg.event.extendedProps?.duration;
+                    const height = arg.event.extendedProps?.height;
+                    const eventData = arg.event.extendedProps?.data || {};
+                    const eventProject = eventData?.project || {};
+                    const client = arg.event.extendedProps?.client || {};
+                    const clientFullName = [client.firstname, client.surname].filter(Boolean).join(' ');
 
-    // --- исправлено: используем let ---
-    let eventTitle = 'Без названия';
-    let backgroundColor = arg.event.backgroundColor || '#ffffff';
-    let fontColor = '#000';
+                    // --- исправлено: используем let ---
+                    let eventTitle = 'Без названия';
+                    let backgroundColor = arg.event.backgroundColor || '#ffffff';
+                    let fontColor = '#000';
 
-    // === Отдельная обработка для "Отсутствие" ===
-    if (eventType === 'unavailable') {
-        eventTitle = 'Отсутствие';
-        backgroundColor = '#d3d3d3'; // любой серый
-        fontColor = '#333';
-    } else if (eventType === 'task') {
-        eventTitle = eventData?.task?.name || 'Без названия задачи';
-    } else if (eventType === 'work' || eventType === 'call') {
-        eventTitle = eventProject?.title || 'Без названия проекта';
-    } else if (eventType === 'negotiation_call') {
-        eventTitle = clientFullName || 'Созвон';
-    } else {
-        eventTitle = arg.event.title || 'Без названия';
-    }
+                    const container = document.createElement('div');
+                    container.style.display = 'flex';
+                    container.style.alignItems = 'flex-start';
+                    container.style.width = '100%';
+                    container.style.height = height || '24px';
+                    container.style.justifyContent = 'space-between';
 
-    const isCall = eventType === 'call' || eventType === 'negotiation_call';
-    let timePrefix = '';
-    if (isCall && arg.event.start) {
-        const date = new Date(arg.event.start);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        timePrefix = `${hours}:${minutes} — `;
-    }
+                    container.style.color = fontColor;
+                    container.style.padding = '2px 4px';
+                    container.style.borderRadius = '4px';
 
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.alignItems = 'flex-start';
-    container.style.width = '100%';
-    container.style.height = height || '24px';
-    container.style.justifyContent = 'space-between';
-    container.style.backgroundColor = backgroundColor;
-    container.style.color = fontColor;
-    container.style.padding = '2px 4px';
-    container.style.borderRadius = '4px';
 
-    const leftSection = document.createElement('div');
-    leftSection.style.display = 'flex';
-    leftSection.style.alignItems = 'center';
-    leftSection.style.gap = '6px';
-    leftSection.style.flex = '1';
-    leftSection.style.overflow = 'hidden';
+                    // === Отдельная обработка для "Отсутствие" ===
+                    if (eventType === 'unavailable') {
+                        eventTitle = 'Отсутствие';
+                        container.classList.add('fc-event', 'fc-daygrid-event', 'striped-event');
+                        //container.style.backgroundColor = '#a54646'; // тот же, что и в CSS .striped-event
+                        fontColor = '#888';
+                    } else if (eventType === 'task') {
+                        eventTitle = eventData?.task?.name || 'Без названия задачи';
+                        container.style.backgroundColor = '#ECECEC';
+                    } else if (eventType === 'work' || eventType === 'call') {
+                        eventTitle = eventProject?.title || 'Без названия проекта';
+                        container.style.backgroundColor = backgroundColor;
+                    } else if (eventType === 'negotiation_call') {
+                        eventTitle = clientFullName || 'Созвон';
+                        container.style.backgroundColor = '#ECECEC';
+                    } else {
+                        eventTitle = arg.event.title || 'Без названия';
+                        container.classList.add('fc-event', 'fc-daygrid-event');
+                        container.style.backgroundColor = backgroundColor;
+                    }
 
-    // Показываем аватар только если это не "Отсутствие"
-    if (userAvatar && eventType !== 'unavailable') {
-        const img = document.createElement('img');
-        img.src = userAvatar;
-        img.style.width = '20px';
-        img.style.height = '20px';
-        img.style.borderRadius = '50%';
-        leftSection.appendChild(img);
-    }
+                    const isCall = eventType === 'call' || eventType === 'negotiation_call';
+                    let timePrefix = '';
+                    if (isCall && arg.event.start) {
+                        const date = new Date(arg.event.start);
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        timePrefix = `${hours}:${minutes} — `;
+                    }
 
-    if (isCall) {
-        const icon = document.createElement('span');
-        icon.innerText = '📞';
-        leftSection.appendChild(icon);
-    }
 
-    const titleSpan = document.createElement('span');
-    titleSpan.innerText = `${timePrefix}${eventTitle}`;
-    titleSpan.style.fontSize = '13px';
-    titleSpan.style.color = fontColor;
-    titleSpan.style.whiteSpace = 'nowrap';
-    titleSpan.style.overflow = 'hidden';
-    titleSpan.style.textOverflow = 'ellipsis';
-    titleSpan.style.flexGrow = '1';
-    titleSpan.style.minWidth = '0';
-    leftSection.appendChild(titleSpan);
+                    const leftSection = document.createElement('div');
+                    leftSection.style.display = 'flex';
+                    leftSection.style.alignItems = 'center';
+                    leftSection.style.gap = '6px';
+                    leftSection.style.flex = '1';
+                    leftSection.style.overflow = 'hidden';
 
-    container.appendChild(leftSection);
+                    // Показываем аватар только если это не "Отсутствие"
+                    if (userAvatar && eventType !== 'unavailable') {
+                        const img = document.createElement('img');
+                        img.src = userAvatar;
+                        img.style.width = '20px';
+                        img.style.height = '20px';
+                        img.style.borderRadius = '50%';
+                        leftSection.appendChild(img);
+                    }
 
-    // Правая часть: длительность
-    if (durationMs) {
-        const hours = Math.floor(durationMs / 3600000);
-        const minutes = Math.floor((durationMs % 3600000) / 60000);
-        const durationText = [];
-        if (hours > 0) durationText.push(`${hours}ч`);
-        if (minutes > 0) durationText.push(`${minutes}м`);
+                    if (isCall) {
+                        const icon = document.createElement('span');
+                        icon.innerText = '📞';
+                        leftSection.appendChild(icon);
+                    }
 
-        if (durationText.length) {
-            const durationEl = document.createElement('span');
-            durationEl.innerText = durationText.join(' ');
-            durationEl.style.fontSize = '13px';
-            durationEl.style.color = '#666';
-            durationEl.style.paddingTop = '3px';
-            container.appendChild(durationEl);
-        }
-    }
+                    const titleSpan = document.createElement('span');
+                    titleSpan.innerText = `${timePrefix}${eventTitle}`;
+                    titleSpan.style.fontSize = '13px';
+                    titleSpan.style.color = fontColor;
+                    titleSpan.style.whiteSpace = 'nowrap';
+                    titleSpan.style.overflow = 'hidden';
+                    titleSpan.style.textOverflow = 'ellipsis';
+                    titleSpan.style.flexGrow = '1';
+                    titleSpan.style.minWidth = '0';
+                    leftSection.appendChild(titleSpan);
 
-    return { domNodes: [container] };
-},
+                    container.appendChild(leftSection);
+
+                    // Правая часть: длительность
+                    if (durationMs) {
+                        const hours = Math.floor(durationMs / 3600000);
+                        const minutes = Math.floor((durationMs % 3600000) / 60000);
+                        const durationText = [];
+                        if (hours > 0) durationText.push(`${hours}ч`);
+                        if (minutes > 0) durationText.push(`${minutes}м`);
+
+                        if (durationText.length) {
+                            const durationEl = document.createElement('span');
+                            durationEl.innerText = durationText.join(' ');
+                            durationEl.style.fontSize = '13px';
+                            durationEl.style.color = '#666';
+                            durationEl.style.paddingTop = '3px';
+                            container.appendChild(durationEl);
+                        }
+                    }
+
+                    return { domNodes: [container] };
+                },
 
 
 
                 headerToolbar: props.content?.showHeader ? {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: Object.keys(availableViews.value).join(','),
+                    left: 'title',
+                    center: Object.keys(availableViews.value).join(','),
+                    right: 'today prev,next',
+
                 } : false,
                 views: availableViews.value,
                 events: processedEvents.value,
@@ -747,12 +778,14 @@ export default {
             calendarStyles,
             currentView,
             selectedEvent,
+            selectedDate,
             // Actions
             changeView,
             goToDate,
             next,
             prev,
             today,
+            handleCellButtonClick,
         };
     },
 };
@@ -829,6 +862,8 @@ export default {
         }
     }
 
+
+
     :deep(.blocked-day) {
         background: #eeeeee !important; // Светло-серый фон
     }
@@ -849,30 +884,41 @@ export default {
         font-size: var(--fc-font-size);
         font-weight: var(--fc-font-weight);
 
-
-
-
         .fc-event,
         .fc-h-event,
         .fc-daygrid-event {
             box-sizing: border-box !important;
-            padding: 1px 3px !important; // 👈 безопасные внутренние отступы
-            margin: 0 !important; // ❗ убираем внешний margin
+            //padding: 1px 3px !important; // 👈 безопасные внутренние отступы
+            //margin: 0 !important; // ❗ убираем внешний margin
             border: none !important;
-            background-color: #fff !important;
+            // background-color: #fff !important;
             color: var(--fc-event-text-color) !important;
+            box-shadow: none !important;
+            //background-color: none !important;
         }
+
+        .fc-daygrid-dot-event, .fc-daygrid-dot-event:hover {
+            background-color: rgba(255, 255, 255, 0) !important;
+           padding: 1px 0px;
+
+        }
+
+
+
 
         .fc-event:hover {
             box-shadow: none !important;
             transform: none !important;
-            padding: 1px 3px !important; // 👈 одинаковый padding при hover
+            //padding: 1px 3px !important; // 👈 одинаковый padding при hover
+            //margin: 0 !important;
+            //background-color: none !important;
         }
 
 
         .fc-event-hover,
         .fc-highlight {
             all: unset !important;
+            //background-color: none !important;
         }
 
 
@@ -927,6 +973,7 @@ export default {
         // Fix for today background in all views
         .fc-day-today {
             background-color: var(--fc-today-bg-color) !important;
+
         }
 
         // Fix for cell backgrounds and text colors
@@ -984,6 +1031,7 @@ export default {
             background: var(--fc-today-button-bg-color, var(--fc-button-bg-color));
             color: var(--fc-today-button-text-color, var(--fc-button-text-color));
             border: none;
+            height: 37px;
 
             &:hover {
                 background-color: var(--fc-today-button-hover-bg-color, var(--fc-button-hover-bg-color));
@@ -1043,7 +1091,7 @@ export default {
         }
 
         .fc-toolbar-title {
-            font-size: var(--fc-font-size);
+            font-size: 16px;
             font-weight: var(--fc-font-weight);
             color: var(--fc-header-text-color);
         }
@@ -1051,12 +1099,14 @@ export default {
         .fc-toolbar {
             background-color: var(--fc-header-bg-color);
             padding: var(--fc-header-padding);
+            margin-bottom: 12px;
         }
 
         .fc-prev-button,
         .fc-next-button {
             background: transparent;
             color: var(--fc-button-text-color);
+
 
             &:hover {
                 background-color: var(--fc-button-hover-bg-color);
@@ -1090,6 +1140,25 @@ export default {
 }
 
 :deep(.fc-daygrid-event-harness) {
-    margin-bottom: 0.5px !important; // 👈 имитация gap между событиями
+    margin-bottom: 0px !important; // 👈 имитация gap между событиями
+    //background-color: none !important;
+
 }
+
+
+:deep(.fc-event.striped-event) {
+   
+  background-image: repeating-linear-gradient(
+    45deg,
+    #e5e8ed,              /* светло-серый цвет полосы */
+    #e5e8ed 1px,           /* ширина полосы */
+    transparent 1px,
+    transparent 6px       /* шаг между полосами */
+  );
+  background-color: #fafafa;  /* основной фон — белый */
+}
+    
+
+
+
 </style>
